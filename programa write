@@ -1,0 +1,64 @@
+PROGRAMA WRITE:
+
+#include <Canbus.h> //Incluimos las librerías.
+#include <defaults.h> //Incluimos las librerías.
+#include <global.h> //Incluimos las librerias.
+#include <mcp2515.h> //Incluimos las librerías.
+#include <mcp2515_defs.h> //Incluimos las librerías.
+#include <Nextion.h> //Incluimos las librerías.
+int sensorpin = A0; //Declaramos los pines
+int sensorvalue= 0; //Declaramos los pines
+int sensortemperatura = A1; //Declaramos los pines
+int temperatura= 0; //Declaramos los pines
+int sensorrpm = A2; //Declaramos los pines
+int rpm= 0; //Declaramos los pines
+
+
+
+
+void setup() {
+  Serial.begin(115200); //Inicializamos con la velocidad de (115200) para la nextion.
+  Serial.println("CAN Write - Testing transmission of CAN Bus messages"); 
+//Enviamos un mensaje para comprobar si se interconectan uno con otro.
+  delay(1000);// tiempo de pausa para poder ver el mensaje.
+  if(Canbus.init(CANSPEED_500))  
+//Inicializamos el controlador CAN MCP2515 y especificamos la velocidad.
+    Serial.println("CAN Init ok"); 
+// Enviamos el mensaje para comprobar que todo funciona correctamente.
+  else
+    Serial.println("Can't init CAN");
+// Enviamos el mensaje para comprobar que todo funciona correctamente.
+    
+  delay(1000);// tiempo de pausa para poder ver los mensajes.
+}
+
+void loop() 
+{
+ int sensorvalue = map (analogRead(sensorpin),0,1023,0,100);
+ //Hacemos un mapeo para reducir la escala del potenciómetro.
+ int temperatura = map (analogRead(sensortemperatura),0,1023,0,100);
+//Hacemos un mapeo para reducir la escala de el potenciómetro.
+  int  rpm= map (analogRead(sensorrpm),0,1023,0,100)
+;//Hacemos un mapeo para reducir la escala del potenciómetro.
+
+tCAN message;
+        message.id = 0xff; //formateado en HEX
+        message.header.rtr = 0;
+        message.header.length = 8; //formateado en DEC
+        message.data[0] = sensorvalue; 
+//Es donde enviaremos los datos de uno de los valores(potenciómetro)
+        message.data[1] = temperatura;
+//Es donde enviaremos los datos de uno de los valores(potenciómetro)
+   message.data[2] = rpm; 
+//Es donde enviaremos los datos de uno de los valores(potenciómetro)
+  message.data[3] = 0xFF; //formateado en DEC
+  message.data[4] = 0x00;
+  message.data[5] = 0x40;
+  message.data[6] = 0x00;
+  message.data[7] = 0x00;
+
+mcp2515_bit_modify(CANCTRL, (1<<REQOP2)|(1<<REQOP1)|(1<<REQOP0), 0); //
+mcp2515_send_message(&message); //es donde se envía los datos de un CanBus a otro.
+
+delay(100); // tiempo de pausa para poder ver los mensajes.
+}

@@ -1,0 +1,63 @@
+PROGRAMA READ:
+include <Canbus.h> // Incluimos las librerías
+#include <defaults.h> // Incluimos las librerías
+#include <global.h> // Incluimos las librerias
+#include <mcp2515.h> // Incluimos las librerías
+#include <mcp2515_defs.h> // Incluimos las librerías
+
+void setup() {
+    Serial.begin(115200); //Inicializamos con la velocidad de (115200) para la nextion.
+  Serial.println("CAN Read - Testing receival of CAN Bus message"); 
+ //Enviamos un mensaje para comprobar si se interconectan uno con otro.
+  delay(1000); // tiempo de pausa para poder ver el mensaje.
+    if(Canbus.init(CANSPEED_500))  
+//Inicializamos el controlador CAN MCP2515 y especificamos la velocidad.
+    Serial.println("CAN Init ok"); 
+// Enviamos el mensaje para comprobar que todo funciona correctamente.
+  else 
+    Serial.println("Can't init CAN"); 
+// Enviamos el mensaje para comprobar que todo funciona correctamente.
+      delay(1000); // tiempo de pausa para poder ver los mensajes.
+}
+
+void loop(){
+ tCAN message; 
+if (mcp2515_check_message()) //mirar si a llegado algún dato
+  {
+    if (mcp2515_get_message(&message)) 
+  {     
+               Serial.print("voltage1.val="); 
+// Escribe el dato en el apartado de la nextion de declaramos.
+               Serial.print(message.data[0],DEC);
+ // Sirve para coger los datos de ese apartado que está en el emisor.
+               Serial.write(0xff);         
+  //Siempre tenemos que poner las tres líneas para poder enviar datos a la pantalla nextion.      
+               Serial.write(0xff);
+               Serial.write(0xff);  
+            
+               Serial.print("j0.val="); // Escribe el dato en el apartado de la nextion de declaramos.
+               Serial.print(message.data[1],DEC); 
+// Sirve para coger los datos de ese apartado que está en el emisor.
+               Serial.write(0xff);        //Siempre tenemos que poner las tres líneas para poder enviar datos a la pantalla nextion.      
+               Serial.write(0xff);
+               Serial.write(0xff);
+           
+                Serial.print("j1.val="); 
+// Escribe el dato en el apartado de la nextion de declaramos.
+              Serial.print(message.data[2],DEC);
+ // Sirve para coger los datos de ese apartado que está en el emisor.
+               Serial.write(0xff);          //Siempre tenemos que poner las tres líneas para poder enviar datos a la pantalla nextion.       
+               Serial.write(0xff);
+               Serial.write(0xff);
+                  
+                { 
+               Serial.print(" "); // Sirve para dejar un espacio entre datos
+                }
+               Serial.println("");   // Sirve para dejar un espacio entre datos
+               Serial.write(0xff);          //Siempre tenemos que poner las tres líneas para poder enviar datos a la pantalla nextion.      
+               Serial.write(0xff);
+               Serial.write(0xff);
+             //}
+           }}
+
+}
